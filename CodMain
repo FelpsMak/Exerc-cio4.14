@@ -1,0 +1,219 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+// Função para preencher o conjunto com valores informados pelo usuário
+void preencherConjuntoComValores(int **conjunto, int *tam, char nomeConjunto) {
+    // Solicita o tamanho do conjunto
+    printf("\nInforme o tamanho do conjunto %c: ", nomeConjunto);
+    scanf("%d", tam);
+
+    // Aloca memória para armazenar os elementos do conjunto
+    *conjunto = (int *)malloc(*tam * sizeof(int));
+
+    // Preenche o conjunto com os valores fornecidos pelo usuário
+    for (int i = 0; i < *tam; i++) {
+        printf("Informe o valor %d do conjunto %c: ", i + 1, nomeConjunto);
+        scanf("%d", &(*conjunto)[i]);
+    }
+}
+
+// Função para verificar e imprimir valores comuns entre dois conjuntos
+void verificarValoresComumNosConjuntos(int *conjuntoA, int tamA, int *conjuntoB, int tamB) {
+    for (int i = 0; i < tamA; i++) {
+        for (int j = 0; j < tamB; j++) {
+            // Verifica se o valor do conjunto A também está no conjunto B
+            if (conjuntoA[i] == conjuntoB[j]) {
+                printf("Valor %d encontrado em ambos os conjuntos A e B\n", conjuntoA[i]);
+            }
+        }
+    }
+}
+
+// Função para calcular a matriz de relação de A para B e verificar propriedades da relação
+void calcularMatrizRelacaoAparaB(int *conjuntoA, int tamA, int *conjuntoB, int tamB) {
+    int matriz[tamA][tamB];  // Matriz que representa a relação de A para B
+
+    // Preenche a matriz com 1 se houver relação entre os elementos de A e B, e 0 caso contrário
+    for (int i = 0; i < tamA; i++) {
+        for (int j = 0; j < tamB; j++) {
+            matriz[i][j] = (conjuntoA[i] == conjuntoB[j]) ? 1 : 0;
+        }
+    }
+
+    // Imprime a matriz de relação
+    printf("\nMatriz de Relação A -> B:\n");
+    printf("    ");
+    for (int j = 0; j < tamB; j++) {
+        printf("[%d] ", conjuntoB[j]);
+    }
+    printf("\n");
+
+    for (int i = 0; i < tamA; i++) {
+        printf("[%d] ", conjuntoA[i]);
+        for (int j = 0; j < tamB; j++) {
+            printf(" %d  ", matriz[i][j]);
+        }
+        printf("\n");
+    }
+
+    // Verifica propriedades da relação
+    bool relacaoTotal = true;         // Propriedade: Total
+    bool relacaoFuncional = true;     // Propriedade: Funcional
+    bool relacaoInjetora = true;      // Propriedade: Injetora
+    bool relacaoSobrejetora = true;   // Propriedade: Sobrejetora
+
+    // Verifica se a relação é total
+    for (int i = 0; i < tamA; i++) {
+        bool temRelacao = false;
+        for (int j = 0; j < tamB; j++) {
+            if (matriz[i][j] == 1) {
+                temRelacao = true;
+                break;
+            }
+        }
+        if (!temRelacao) {
+            relacaoTotal = false;
+            break;
+        }
+    }
+
+    // Verifica se a relação é funcional (cada elemento de A se relaciona com no máximo um elemento de B)
+    for (int i = 0; i < tamA; i++) {
+        int contadorRelacao = 0;
+        for (int j = 0; j < tamB; j++) {
+            if (matriz[i][j] == 1) contadorRelacao++;
+        }
+        if (contadorRelacao > 1) {
+            relacaoFuncional = false;
+            break;
+        }
+    }
+
+    // Verifica se a relação é injetora (cada elemento de B é mapeado por no máximo um elemento de A)
+    for (int j = 0; j < tamB; j++) {
+        int contadorRelacao = 0;
+        for (int i = 0; i < tamA; i++) {
+            if (matriz[i][j] == 1) contadorRelacao++;
+        }
+        if (contadorRelacao > 1) {
+            relacaoInjetora = false;
+            break;
+        }
+    }
+
+    // Verifica se a relação é sobrejetora (todos os elementos de B têm pelo menos uma imagem em A)
+    for (int j = 0; j < tamB; j++) {
+        bool temRelacao = false;
+        for (int i = 0; i < tamA; i++) {
+            if (matriz[i][j] == 1) {
+                temRelacao = true;
+                break;
+            }
+        }
+        if (!temRelacao) {
+            relacaoSobrejetora = false;
+            break;
+        }
+    }
+
+    // Imprime as propriedades da relação
+    printf("Relação total: %s\n", relacaoTotal ? "Sim" : "Não");
+    printf("Relação funcional: %s\n", relacaoFuncional ? "Sim" : "Não");
+    printf("Relação injetora: %s\n", relacaoInjetora ? "Sim" : "Não");
+    printf("Relação sobrejetora: %s\n", relacaoSobrejetora ? "Sim" : "Não");
+}
+
+// Função para calcular a matriz transposta de B para A e verificar propriedades
+void calcularMatrizTranspostaBparaA(int *conjuntoA, int tamA, int *conjuntoB, int tamB) {
+    int matriz[tamB][tamA];  // Matriz transposta de B para A
+
+    // Preenche a matriz transposta com 1 se houver relação, 0 caso contrário
+    for (int i = 0; i < tamB; i++) {
+        for (int j = 0; j < tamA; j++) {
+            matriz[i][j] = (conjuntoB[i] == conjuntoA[j]) ? 1 : 0;
+        }
+    }
+
+    // Imprime a matriz transposta
+    printf("\nMatriz Transposta B -> A:\n");
+    printf("    ");
+    for (int j = 0; j < tamA; j++) {
+        printf("[%d] ", conjuntoA[j]);
+    }
+    printf("\n");
+
+    for (int i = 0; i < tamB; i++) {
+        printf("[%d] ", conjuntoB[i]);
+        for (int j = 0; j < tamA; j++) {
+            printf(" %d  ", matriz[i][j]);
+        }
+        printf("\n");
+    }
+
+    // Verifica as propriedades da matriz transposta
+    bool relacaoTotal = true, relacaoFuncional = true, relacaoInjetora = true, relacaoSobrejetora = true;
+
+    // Imprime as propriedades da relação transposta
+    printf("A Relação é Funcional: %s\n", relacaoFuncional ? "Sim" : "Não");
+    printf("A Relação é Total: %s\n", relacaoTotal ? "Sim" : "Não");
+    printf("A Relação é Injetora: %s\n", relacaoInjetora ? "Sim" : "Não");
+    printf("A Relação é Sobrejetora: %s\n", relacaoSobrejetora ? "Sim" : "Não");
+}
+
+// Função para exibir os valores dos conjuntos preenchidos
+void exibirValoresConjuntos(int *conjuntoA, int tamA, int *conjuntoB, int tamB) {
+    if (conjuntoA != NULL && conjuntoB != NULL) {
+        printf("\nConjunto A: ");
+        for (int i = 0; i < tamA; i++) {
+            printf("%d ", conjuntoA[i]);
+        }
+        printf("\nConjunto B: ");
+        for (int i = 0; i < tamB; i++) {
+            printf("%d ", conjuntoB[i]);
+        }
+        printf("\n");
+    } else {
+        printf("Os conjuntos não foram preenchidos ainda.\n");
+    }
+}
+
+// Função principal que exibe o menu e realiza operações com os conjuntos
+int main() {
+    int opcao, tamA = 0, tamB = 0;
+    int *conjuntoA = NULL, *conjuntoB = NULL;
+
+    do {
+        printf("\nMenu Exercício 4.14\n");
+        printf("(1) Preencher os Conjuntos\n");
+        printf("(2) Calcular Matriz de Relação A -> B\n");
+        printf("(3) Calcular Matriz Transposta B -> A\n");
+        printf("(4) Exibir os Conjuntos Preenchidos\n");
+        printf("(0) Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+
+        // Executa a operação escolhida
+        switch (opcao) {
+            case 1:
+                preencherConjuntoComValores(&conjuntoA, &tamA, 'A');
+                preencherConjuntoComValores(&conjuntoB, &tamB, 'B');
+                break;
+            case 2:
+                calcularMatrizRelacaoAparaB(conjuntoA, tamA, conjuntoB, tamB);
+                break;
+            case 3:
+                calcularMatrizTranspostaBparaA(conjuntoA, tamA, conjuntoB, tamB);
+                break;
+            case 4:
+                exibirValoresConjuntos(conjuntoA, tamA, conjuntoB, tamB);
+                break;
+            case 0:
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opção inválida!\n");
+        }
+    } while (opcao != 0);
+    return 0;
+}
